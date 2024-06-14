@@ -1,7 +1,6 @@
 import mercadopago from 'mercadopago';
 import { MERCADOPAGO_API_KEY } from '../config.js';
 import { getPool, connectToDatabase, sql } from '../db.js';
-import { v4 as uuidv4 } from 'uuid';
 
 // Configurar MercadoPago una vez
 mercadopago.configure({
@@ -59,10 +58,10 @@ async function guardarPagoEnBaseDeDatos(relevantData) {
   const query = `
     INSERT INTO payment (
       status, status_detail, date_approved, payment_method_id, payment_method_type,
-      transaction_amount, payer_email, payer_id, order_id, order_type
+      transaction_amount, payer_email, payer_id, operation_id, order_id, order_type
     ) VALUES (
       @status, @status_detail, @date_approved, @payment_method_id, @payment_method_type,
-      @transaction_amount, @payer_email, @payer_id, @order_id, @order_type
+      @transaction_amount, @payer_email, @payer_id, @operation_id, @order_id, @order_type
     );
     SELECT SCOPE_IDENTITY() AS id;
   `;
@@ -77,6 +76,7 @@ async function guardarPagoEnBaseDeDatos(relevantData) {
     .input('payer_email', sql.VarChar, relevantData.payer_email)
     .input('payer_id', sql.VarChar, relevantData.payer_id)
     .input('order_id', sql.VarChar, relevantData.order_id) // Cambiado a VarChar
+    .input('operation_id', sql.VarChar, relevantData.operation_id.toString())
     .input('order_type', sql.VarChar, relevantData.order_type)
     .query(query);
 
@@ -112,7 +112,7 @@ async function guardarOrdenEnBaseDeDatos(userId, items, totalAmount, paymentId) 
 
   for (const item of items) {
     await pool.request()
-      .input('order_id', sql.Int, orderId)
+      .input('order_id', sql.BigInt, orderId)
       .input('producto_id', sql.BigInt, item.id)
       .input('quantity', sql.Int, item.quantity)
       .input('price', sql.Decimal, item.unit_price)
@@ -159,8 +159,8 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    const orderId = uuidv4(); // Generar un UUID para la orden
-    ordenesTemporales.set(orderId, { items, user_id });
+    const tempOrderId = `temp_order_${Date.now()}`; // Usar un ID único basado en la hora actual para la orden temporal
+    ordenesTemporales.set(tempOrderId, { items, user_id });
 
     const result = await mercadopago.preferences.create({
       items: items.map(item => ({
@@ -170,7 +170,7 @@ export const createOrder = async (req, res) => {
         currency_id: item.currency_id || 'CLP',
         quantity: item.quantity,
       })),
-      notification_url: `https://e370-201-188-214-54.ngrok-free.app/webhook?orderId=${orderId}`,
+      notification_url: `https://bae7-201-188-214-54.ngrok-free.app/webhook?orderId=${tempOrderId}`,
       back_urls: {
         success: 'http://localhost:4200/',
       },
@@ -186,12 +186,10 @@ export const createOrder = async (req, res) => {
 export const receiveWebhook = async (req, res) => {
   try {
     const { query } = req;
-    const { orderId } = query;
+    const { orderId: tempOrderId } = query;
 
     if (query.type === 'payment') {
       const data = await mercadopago.payment.findById(query['data.id']);
-
-      console.log(data.body);
 
       if (!data.body) {
         console.error('No body found in webhook data');
@@ -207,12 +205,13 @@ export const receiveWebhook = async (req, res) => {
         transaction_amount: data.body.transaction_amount,
         payer_email: data.body.payer.email,
         payer_id: data.body.payer.id,
-        order_id: orderId, // Usar el UUID generado
+        order_id: tempOrderId, // Usar el orderId recibido en el webhook temporalmente
+        operation_id: data.body.id,
         order_type: data.body.order.type,
       };
 
       if (data.body.status === 'approved') {
-        const orderDetails = ordenesTemporales.get(orderId);
+        const orderDetails = ordenesTemporales.get(tempOrderId);
 
         if (orderDetails) {
           const { items, user_id } = orderDetails;
@@ -224,7 +223,7 @@ export const receiveWebhook = async (req, res) => {
 
           const paymentId = await guardarPagoEnBaseDeDatos(relevantData);  // Guardar los datos del pago y obtener el ID del pago
           await guardarOrdenEnBaseDeDatos(user_id, items, totalAmount, paymentId);  // Guardar la orden con el ID del pago
-          ordenesTemporales.delete(orderId);
+          ordenesTemporales.delete(tempOrderId);
         } else {
           console.error('No order found in memory for the given orderId');
         }

@@ -1,12 +1,9 @@
 const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
-const cors = require('cors');
-
-// Para importar archivos locales, asegúrate de especificar la extensión .js si es necesario y usar require
-const paymentRoutes = require('./routes/payment.routes.js');
-const { connectToDatabase } = require('./config/database.js');
-
+import morgan from 'morgan';
+import path from 'path';
+import cors from 'cors';
+import paymentRoutes from './routes/payment.routes.js';
+import { connectToDatabase } from './config/database.js';
 
 const app = express();
 

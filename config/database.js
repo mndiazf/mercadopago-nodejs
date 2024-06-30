@@ -1,10 +1,10 @@
 import sql from 'mssql';
 
 const config = {
-  user: 'sa',
-  password: 'Secret123!',
-  server: 'localhost',
-  database: 'mousecatDB',
+  user: 'admin_mousecat',
+  password: 'Holap12321x#',
+  server: 'mousecat-server.database.windows.net',
+  database: 'mousecat_database',
   options: {
     encrypt: false,
     enableArithAbort: true,

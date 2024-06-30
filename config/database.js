@@ -6,7 +6,7 @@ const config = {
   server: 'mousecat-server.database.windows.net',
   database: 'mousecat_database',
   options: {
-    encrypt: false,
+    encrypt: true,
     enableArithAbort: true,
   },
 };

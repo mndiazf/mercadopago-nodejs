@@ -7,7 +7,7 @@ import { connectToDatabase } from './config/database.js';
 import fs from 'fs';
 import https from 'https';
 
-// Crea una instancia de Express
+// Crea una instancia de Express para HTTPS
 const app = express();
 
 // Configura CORS para aceptar cualquier origen
@@ -40,15 +40,16 @@ https.createServer(httpsOptions, app).listen(8444, () => {
   console.log('Servidor HTTPS corriendo en el puerto 8444');
 });
 
-// Opcional: redireccionar HTTP a HTTPS
+// Crear una instancia de Express para HTTP
 const httpApp = express();
 httpApp.use((req, res, next) => {
   if (!req.secure) {
-    return res.redirect('https://' + req.headers.host.replace(/:80$/, ':8444') + req.url);
+    return res.redirect('https://' + req.headers.host.replace(/:3000$/, ':8444') + req.url);
   }
   next();
 });
 
-httpApp.listen(80, () => {
-  console.log('Servidor HTTP corriendo en el puerto 80 y redirigiendo a HTTPS');
+// Escuchar HTTP en el puerto 3000 y redirigir a HTTPS
+httpApp.listen(3000, () => {
+  console.log('Servidor HTTP corriendo en el puerto 3000 y redirigiendo a HTTPS');
 });

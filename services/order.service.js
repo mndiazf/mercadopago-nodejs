@@ -26,9 +26,9 @@ export const createOrder = async (items, user_id) => {
       currency_id: item.currency_id || 'CLP',
       quantity: item.quantity,
     })),
-    notification_url: `https://6970-200-28-211-67.ngrok-free.app/webhook?orderId=${tempOrderId}`,
+    notification_url: `https://mousecat.xyz:8444/webhook?orderId=${tempOrderId}`,
     back_urls: {
-      success: 'http://localhost:4200/',
+      success: 'https://gentle-dune-082b8f81e.5.azurestaticapps.net/#/home/',
     },
   });
 

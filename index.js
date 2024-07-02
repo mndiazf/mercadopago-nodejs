@@ -8,7 +8,7 @@ import { connectToDatabase } from './config/database.js';
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:4200',
+  origin: 'https://mousecat.lol/',
   methods: ['GET', 'POST'],
 }));
 

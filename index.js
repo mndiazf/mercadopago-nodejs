@@ -10,10 +10,20 @@ import https from 'https';
 // Crea una instancia de Express para HTTPS
 const app = express();
 
-// Configura CORS para aceptar cualquier origen
+// Configura CORS para aceptar solicitudes desde dominios específicos
+const allowedOrigins = ['https://mousecat.lol'];
+
 app.use(cors({
-  origin: '*',  // Permite cualquier origen
-  methods: ['GET', 'POST'],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 
 // Middlewares
@@ -21,7 +31,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Rutas
-app.use(paymentRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Archivos estáticos
 app.use(express.static(path.resolve('src/public')));

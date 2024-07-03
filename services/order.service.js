@@ -26,9 +26,9 @@ export const createOrder = async (items, user_id) => {
       currency_id: item.currency_id || 'CLP',
       quantity: item.quantity,
     })),
-    notification_url: `mousecat-payment.azurewebsites.net/webhook?orderId=${tempOrderId}`,
+    notification_url: `https://mousecat.xyz:8444/webhook?orderId=${tempOrderId}`,
     back_urls: {
-      success: 'https://mousecat.lol/#/home/',
+      success: 'https://gentle-dune-082b8f81e.5.azurestaticapps.net/#/home/',
     },
   });
 

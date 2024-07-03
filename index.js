@@ -1,6 +1,5 @@
 import express from 'express';
 import morgan from 'morgan';
-import path from 'path';
 import cors from 'cors';
 import paymentRoutes from './routes/payment.routes.js';
 import { connectToDatabase } from './config/database.js';

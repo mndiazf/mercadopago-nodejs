@@ -2,7 +2,7 @@ import { verificarUsuarioExistente } from '../repositories/user.repository.js';
 import { verificarStock, actualizarStock } from '../repositories/product.repository.js';
 import { guardarOrdenEnBaseDeDatos } from '../repositories/order.repository.js';
 import { guardarPagoEnBaseDeDatos } from '../repositories/payment.repository.js';
-import mercadopago from '../config/mercadopago.js';
+import mercadopago from 'mercadopago';
 
 const ordenesTemporales = new Map();
 

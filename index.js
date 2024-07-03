@@ -25,6 +25,6 @@ app.use(paymentRoutes);
 connectToDatabase().catch(err => console.error('Failed to connect to database', err));
 
 // Escuchar HTTP en el puerto 3000
-app.listen(3000, () => {
-  console.log('Servidor HTTP corriendo en el puerto 3000');
+app.listen(8080, () => {
+  console.log('Servidor HTTP corriendo en el puerto 8080');
 });

@@ -1,6 +1,4 @@
-// db.js
 import sql from 'mssql';
-
 
 const config = {
   user: 'admin_mousecat',
@@ -12,7 +10,6 @@ const config = {
     enableArithAbort: true,
   },
 };
-
 
 const pool = new sql.ConnectionPool(config);
 
@@ -31,4 +28,4 @@ export const connectToDatabase = async () => {
 };
 
 export const getPool = () => pool;
-export { sql }; // Exportamos sql para poder usarlo en otros archivos
+export { sql };

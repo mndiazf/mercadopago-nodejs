@@ -18,6 +18,11 @@ export const createOrder = async (items, user_id) => {
   const tempOrderId = `temp_order_${Date.now()}`;
   ordenesTemporales.set(tempOrderId, { items, user_id });
 
+  // Configurar MercadoPago una vez
+mercadopago.configure({
+  access_token: "APP_USR-7135415648466462-061015-475f0b3cb50e927e7dfcfbd11ae0bc55-1850638629",
+});
+
   const result = await mercadopago.preferences.create({
     items: items.map(item => ({
       id: item.id,

@@ -31,9 +31,9 @@ mercadopago.configure({
       currency_id: item.currency_id || 'CLP',
       quantity: item.quantity,
     })),
-    notification_url: `https://mousecat.xyz:8444/webhook?orderId=${tempOrderId}`,
+    notification_url: `https://mousecat-node-payment.azurewebsites.net/webhook?orderId=${tempOrderId}`,
     back_urls: {
-      success: 'https://gentle-dune-082b8f81e.5.azurestaticapps.net/#/home/',
+      success: 'https://mousecat.lol/#/home/',
     },
   });
 
